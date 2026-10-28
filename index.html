@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Guerra delle Correnti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff003c;
+            --dark-bg: #050510;
+        }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a3a 0%, #050510 80%);
+            min-height: 100vh;
+        }
+        h1, h2, h3, .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .neon-text-cyan {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan);
+        }
+        .neon-text-pink {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink);
+        }
+        .neon-border-cyan {
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5), inset 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+        .neon-border-pink {
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.5), inset 0 0 10px rgba(255, 0, 60, 0.2);
+        }
+        .btn {
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+        .input-futuristic {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            text-align: center;
+            font-size: 1.5rem;
+            outline: none;
+            transition: box-shadow 0.3s ease;
+        }
+        .input-futuristic:focus {
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 sm:p-8">
+
+    <!-- HEADER -->
+    <header class="w-full max-w-4xl text-center mb-8">
+        <h1 class="text-3xl sm:text-5xl neon-text-cyan uppercase mb-2">La Guerra delle Correnti</h1>
+        <p class="text-lg sm:text-xl text-gray-400">Archivi Segreti di Nikola Tesla</p>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main id="app-container" class="w-full max-w-4xl flex-grow relative">
+        
+        <!-- MENU VIEW -->
+        <section id="view-menu" class="flex flex-col items-center justify-center space-y-8 py-12">
+            <p class="text-center text-xl max-w-2xl mb-4">
+                I progetti segreti del circuito perfetto sono stati frammentati. 
+                Per recuperarli, dovrai risolvere i nodi e le maglie padroneggiando le Leggi di Kirchhoff.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-6 w-full max-w-md">
+                <button onclick="app.showView('scopri')" class="btn flex-1 py-4 px-6 neon-border-cyan rounded-lg text-xl">
+                    Scopri (Teoria)
+                </button>
+                <button onclick="app.startChallenge()" class="btn flex-1 py-4 px-6 neon-border-pink rounded-lg text-xl neon-text-pink">
+                    Inizia Sfida
+                </button>
+            </div>
+        </section>
+
+        <!-- SCOPRI VIEW -->
+        <section id="view-scopri" class="hidden flex-col items-center w-full">
+            <h2 class="text-3xl neon-text-cyan mb-6 orbitron">Database: Concetti Chiave</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8" id="scopri-cards-container">
+                <!-- Cards injected via JS -->
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="app.goBackFromScopri()" class="btn py-3 px-8 border border-gray-500 rounded text-lg hover:bg-gray-800">
+                    Indietro
+                </button>
+            </div>
+        </section>
+
+        <!-- CHALLENGE VIEW -->
+        <section id="view-challenge" class="hidden flex-col items-center w-full max-w-2xl mx-auto">
+            <!-- Progress & Stats -->
+            <div class="flex justify-between items-center w-full mb-6 border-b border-cyan-800 pb-4">
+                <div class="text-xl">Prova: <span id="q-current" class="neon-text-cyan font-bold">1</span>/<span id="q-total">10</span></div>
+                <div class="text-xl">Tentativi: <span id="q-attempts" class="text-yellow-400 font-bold">3</span></div>
+                <button onclick="app.openScopriModal()" class="btn px-4 py-2 text-sm neon-border-cyan rounded">
+                    Consulta Appunti
+                </button>
+            </div>
+
+            <!-- Question Card -->
+            <div class="neon-border-cyan rounded-xl p-6 sm:p-10 w-full bg-opacity-20 bg-cyan-900 shadow-2xl mb-8 relative">
+                <h3 class="text-2xl mb-6 orbitron text-center" id="q-text">Domanda qui...</h3>
+                
+                <div class="flex flex-col items-center">
+                    <input type="text" id="q-input" class="input-futuristic p-4 w-full max-w-xs rounded mb-6" placeholder="Risposta..." autocomplete="off">
+                    <button onclick="app.checkAnswer()" class="btn py-3 px-10 neon-border-cyan rounded-lg text-xl w-full max-w-xs">
+                        Invia Dati
+                    </button>
+                </div>
+                
+                <!-- Feedback Area -->
+                <div id="feedback-area" class="hidden mt-6 p-4 rounded-lg text-center text-lg font-bold">
+                    <div id="feedback-icon" class="text-4xl mb-2"></div>
+                    <div id="feedback-text"></div>
+                    <button id="btn-next" onclick="app.nextQuestion()" class="hidden btn mt-4 py-2 px-6 border rounded-lg mx-auto">Continua</button>
+                    <button id="btn-scopri-link" onclick="app.openScopriModalSpecific()" class="hidden btn mt-4 py-2 px-6 border border-yellow-400 text-yellow-400 rounded-lg mx-auto hover:bg-yellow-900">
+                        Ripassa questo concetto
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULTS VIEW -->
+        <section id="view-results" class="hidden flex-col items-center w-full">
+            <h2 class="text-4xl neon-text-pink mb-4 orbitron">Decrittazione Completata</h2>
+            <div class="text-2xl mb-8">Punteggio: <span id="final-score" class="neon-text-cyan text-4xl">0</span> / 10</div>
+
+            <div id="review-section" class="w-full max-w-2xl hidden">
+                <h3 class="text-2xl neon-text-cyan mb-4 orbitron border-b border-cyan-800 pb-2">Errori Rilevati (Ripasso)</h3>
+                <div id="review-list" class="space-y-4 mb-8">
+                    <!-- Wrong answers injected via JS -->
+                </div>
+            </div>
+
+            <button onclick="app.reset()" class="btn py-4 px-10 neon-border-cyan rounded-lg text-xl mt-4">
+                Torna al Menu Principale
+            </button>
+        </section>
+
+    </main>
+
+    <!-- SCOPRI MODAL (For Challenge View) -->
+    <div id="scopri-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 neon-border-cyan bg-[#050510] rounded-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl neon-text-cyan orbitron">Appunti di Teoria</h2>
+                <button onclick="app.closeScopriModal()" class="text-red-500 text-3xl font-bold hover:text-red-400">&times;</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="modal-cards-container">
+                <!-- Cards injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const discoverCards = [
+            {
+                id: 1,
+                title: "1. I Nodi e la LKC",
+                content: "Un NODO è un punto in cui convergono 3 o più conduttori. La <b>Legge di Kirchhoff delle Correnti (LKC)</b> afferma che la somma delle correnti entranti è uguale alla somma delle uscenti (Σ I_in = Σ I_out).",
+                icon: "⚡"
+            },
+            {
+                id: 2,
+                title: "2. Segno delle Correnti",
+                content: "Nelle equazioni algebriche dei nodi (Σ I = 0), si assegna un segno. Convenzione comune: correnti <b>entranti positive (+)</b>, correnti <b>uscenti negative (-)</b>. Se il calcolo dà risultato negativo, il verso reale è <b>opposto</b> a quello disegnato.",
+                icon: "↔️"
+            },
+            {
+                id: 3,
+                title: "3. Le Maglie e la LKT",
+                content: "Una MAGLIA è un percorso chiuso di un circuito. La <b>Legge di Kirchhoff delle Tensioni (LKT)</b> afferma che la somma algebrica delle tensioni lungo la maglia è zero (Σ V = 0).",
+                icon: "⭕"
+            },
+            {
+                id: 4,
+                title: "4. Segno delle Tensioni (LKT)",
+                content: "Fissato un verso di percorrenza della maglia (es. orario): se entri dal <b>polo negativo (-)</b> di un generatore, consideri la tensione <b>positiva (+)</b> nell'equazione. Nei resistori, la freccia della tensione ha verso <b>opposto</b> alla corrente (convenzione utilizzatori).",
+                icon: "±"
+            }
+        ];
+
+        const questions = [
+            {
+                q: "Nodo A: una corrente di 4A entra, una corrente di 1A esce. Per la LKC, la terza corrente (I3) deve 'entrare' o 'uscire' per bilanciare il nodo?",
+                answers: ["uscire"],
+                type: "text",
+                explanation: "Entrano 4A, quindi devono uscire 4A in totale. Poiché esce già 1A, I3 deve uscire (di 3A) per arrivare a 4A uscenti.",
+                ref: 1
+            },
+            {
+                q: "In un nodo entrano I1=5A e I2=2A, ed esce solo I3. Inserisci il valore di I3.",
+                answers: ["7"],
+                type: "number",
+                explanation: "La somma delle correnti entranti (5+2=7) deve essere uguale all'unica corrente uscente.",
+                ref: 1
+            },
+            {
+                q: "Se il risultato del calcolo di una corrente Ix è -3A, significa che il suo verso reale è 'uguale' o 'opposto' a quello disegnato nello schema?",
+                answers: ["opposto", "contrario"],
+                type: "text",
+                explanation: "Un valore negativo indica che il verso ipotizzato a priori sul disegno era sbagliato, e quello reale è opposto.",
+                ref: 2
+            },
+            {
+                q: "Scrivendo l'equazione di un nodo con la forma ΣI=0, se consideriamo le correnti entranti positive, con che segno inseriamo una corrente uscente? Rispondi con la parola 'positivo' o 'negativo'.",
+                answers: ["negativo"],
+                type: "text",
+                explanation: "Le correnti uscenti si oppongono a quelle entranti, quindi assumono segno discorde (negativo).",
+                ref: 2
+            },
+            {
+                q: "La Legge di Kirchhoff delle Tensioni (LKT) stabilisce che la somma algebrica delle tensioni in una maglia chiusa è uguale a...?",
+                answers: ["0", "zero"],
+                type: "number", // can be word too, we check both
+                explanation: "L'energia fornita dai generatori viene interamente spesa lungo il percorso chiuso, portando la somma a zero.",
+                ref: 3
+            },
+            {
+                q: "Maglia chiusa: un generatore fornisce 12V, un resistore R1 ha una caduta di 5V, un resistore R2 ha una caduta V_R2. Quanto vale V_R2 in Volt?",
+                answers: ["7"],
+                type: "number",
+                explanation: "12V (totale generato) - 5V (assorbito da R1) = 7V residui assorbiti da R2.",
+                ref: 3
+            },
+            {
+                q: "Percorrendo una maglia in senso orario, incontri un generatore entrando dal suo morsetto negativo (-). Nell'equazione ΣV=0, secondo la regola di Edutecnica, questa tensione è inserita con segno 'positivo' o 'negativo'?",
+                answers: ["positivo"],
+                type: "text",
+                explanation: "Se il verso di percorrenza entra dal morsetto negativo, la f.e.m. è considerata positiva perché il percorso attraversa il componente nel verso di innalzamento del potenziale.",
+                ref: 4
+            },
+            {
+                q: "In un resistore (convenzione degli utilizzatori), la freccia della tensione ha verso 'uguale' o 'opposto' rispetto alla freccia della corrente?",
+                answers: ["opposto", "contrario"],
+                type: "text",
+                explanation: "Nel bipolo passivo, la corrente entra dal morsetto a potenziale maggiore (+). La freccia della tensione punta verso il +, quindi è opposta alla corrente.",
+                ref: 4
+            },
+            {
+                q: "Maglia con un generatore E1=20V (percorso entra dal -) e un generatore E2=5V (percorso entra dal +). Trascurando le resistenze, qual è la tensione totale della maglia (+20 -5)?",
+                answers: ["15"],
+                type: "number",
+                explanation: "Entrando dal (-) E1 è +20. Entrando dal (+) E2 è -5. Totale: 20 - 5 = 15V.",
+                ref: 4
+            },
+            {
+                q: "Nodo con 4 rami: I1=10A (entra), I2=3A (esce), I3=5A (entra). Quanto vale I4 che esce per bilanciare il nodo?",
+                answers: ["12"],
+                type: "number",
+                explanation: "Entranti: 10 + 5 = 15A. Uscenti: 3A + I4. Quindi I4 = 15 - 3 = 12A.",
+                ref: 1
+            }
+        ];
+
+        // --- APP STATE ---
+        const app = {
+            currentView: 'menu',
+            previousView: 'menu',
+            qIndex: 0,
+            attemptsLeft: 3,
+            score: 0,
+            wrongAnswers: [], // stores {q, explanation}
+            currentFailedRef: null,
+
+            init() {
+                this.renderScopriCards();
+            },
+
+            showView(viewId) {
+                document.getElementById('view-menu').classList.add('hidden');
+                document.getElementById('view-scopri').classList.add('hidden');
+                document.getElementById('view-challenge').classList.add('hidden');
+                document.getElementById('view-results').classList.add('hidden');
+                
+                document.getElementById('view-' + viewId).classList.remove('hidden');
+                
+                if(viewId === 'scopri') {
+                    this.previousView = this.currentView;
+                }
+                this.currentView = viewId;
+            },
+
+            goBackFromScopri() {
+                this.showView(this.previousView === 'scopri' ? 'menu' : this.previousView);
+            },
+
+            renderScopriCards() {
+                const makeCardHtml = (c) => `
+                    <div class="p-6 neon-border-cyan rounded-lg bg-cyan-900 bg-opacity-20 flex flex-col">
+                        <h3 class="text-xl orbitron text-cyan-300 mb-3 flex items-center gap-2">
+                            <span>${c.icon}</span> ${c.title}
+                        </h3>
+                        <p class="text-gray-200 leading-relaxed">${c.content}</p>
+                    </div>
+                `;
+                document.getElementById('scopri-cards-container').innerHTML = discoverCards.map(makeCardHtml).join('');
+                document.getElementById('modal-cards-container').innerHTML = discoverCards.map(makeCardHtml).join('');
+            },
+
+            startChallenge() {
+                this.qIndex = 0;
+                this.score = 0;
+                this.wrongAnswers = [];
+                this.showView('challenge');
+                this.loadQuestion();
+            },
+
+            loadQuestion() {
+                this.attemptsLeft = 3;
+                this.currentFailedRef = null;
+                const q = questions[this.qIndex];
+                
+                document.getElementById('q-current').textContent = this.qIndex + 1;
+                document.getElementById('q-text').textContent = q.q;
+                document.getElementById('q-attempts').textContent = this.attemptsLeft;
+                
+                const inputEl = document.getElementById('q-input');
+                inputEl.value = '';
+                inputEl.disabled = false;
+                inputEl.focus();
+                
+                document.getElementById('feedback-area').classList.add('hidden');
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-scopri-link').classList.add('hidden');
+            },
+
+            checkAnswer() {
+                const inputEl = document.getElementById('q-input');
+                if (inputEl.disabled) return; // Prevent multiple clicks if already answered
+                
+                let userAnswer = inputEl.value.trim().toLowerCase();
+                if (userAnswer === '') return;
+
+                const q = questions[this.qIndex];
+                const isCorrect = q.answers.includes(userAnswer);
+
+                const fbArea = document.getElementById('feedback-area');
+                const fbIcon = document.getElementById('feedback-icon');
+                const fbText = document.getElementById('feedback-text');
+                
+                fbArea.classList.remove('hidden', 'bg-green-900', 'bg-red-900', 'border-green-500', 'border-red-500', 'border');
+                fbArea.classList.add('border');
+
+                if (isCorrect) {
+                    this.score++;
+                    inputEl.disabled = true;
+                    fbArea.classList.add('bg-green-900', 'border-green-500', 'text-green-300');
+                    fbIcon.innerHTML = '✓ Corretto!';
+                    fbIcon.className = 'text-3xl mb-2 text-green-400';
+                    fbText.innerHTML = q.explanation;
+                    document.getElementById('btn-next').classList.remove('hidden');
+                } else {
+                    this.attemptsLeft--;
+                    document.getElementById('q-attempts').textContent = this.attemptsLeft;
+                    
+                    fbArea.classList.add('bg-red-900', 'border-red-500', 'text-red-200');
+                    fbIcon.innerHTML = '✗ Errore';
+                    fbIcon.className = 'text-3xl mb-2 text-red-400';
+                    
+                    if (this.attemptsLeft > 0) {
+                        fbText.innerHTML = `Riprova. L'analisi è fallita.`;
+                        inputEl.value = '';
+                        inputEl.focus();
+                    } else {
+                        inputEl.disabled = true;
+                        fbText.innerHTML = `Tentativi esauriti.<br><br><b>Perché:</b> ${q.explanation}`;
+                        this.wrongAnswers.push({q: q.q, explanation: q.explanation});
+                        this.currentFailedRef = q.ref;
+                        document.getElementById('btn-next').classList.remove('hidden');
+                        document.getElementById('btn-scopri-link').classList.remove('hidden');
+                    }
+                }
+            },
+
+            nextQuestion() {
+                this.qIndex++;
+                if (this.qIndex < questions.length) {
+                    this.loadQuestion();
+                } else {
+                    this.endChallenge();
+                }
+            },
+
+            endChallenge() {
+                this.showView('results');
+                document.getElementById('final-score').textContent = this.score;
+                
+                const reviewSec = document.getElementById('review-section');
+                const reviewList = document.getElementById('review-list');
+                
+                if (this.wrongAnswers.length > 0) {
+                    reviewSec.classList.remove('hidden');
+                    reviewList.innerHTML = this.wrongAnswers.map(wa => `
+                        <div class="p-4 border border-red-800 rounded bg-red-900 bg-opacity-20">
+                            <p class="font-bold text-gray-300 mb-2">Q: ${wa.q}</p>
+                            <p class="text-cyan-200">A: ${wa.explanation}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    reviewSec.classList.add('hidden');
+                }
+            },
+
+            reset() {
+                this.showView('menu');
+            },
+
+            openScopriModal() {
+                document.getElementById('scopri-modal').classList.remove('hidden');
+            },
+
+            closeScopriModal() {
+                document.getElementById('scopri-modal').classList.add('hidden');
+            },
+            
+            openScopriModalSpecific() {
+                // In a more complex app we could highlight the specific card.
+                // Here we just open the modal so the student can read it.
+                this.openScopriModal();
+            }
+        };
+
+        // Allow Enter key to submit
+        document.getElementById('q-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                app.checkAnswer();
+            }
+        });
+
+        // Initialize
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
